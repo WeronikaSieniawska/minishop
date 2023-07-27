@@ -13,10 +13,10 @@
 <body>
     <div class="sidebar">
         <ul>
-            <li class="tab-link" data-tab="invoice-of-sales">Invoice of Sales</li>
-            <li class="tab-link" data-tab="purchase-order">Purchase Order</li>
-            <li class="tab-link active" data-tab="income-and-expenditure">Income and Expenditure</li>
-            <li class="tab-link" data-tab="reports">Reports</li>
+            <li class="tab-link" data-tab="invoice-of-sales"><a href="{% url 'polls:invoice_of_sales' %}">Invoice of sales</a></li>
+            <li class="tab-link" data-tab="purchase-order"><a href="{% url 'polls:purchase_order' %}">Purchase order</a></li>
+            <li class="tab-link active" data-tab="income-and-expenditure"><a href="#">Income and Expenditure</a></li>
+            <li class="tab-link" data-tab="reports"><a href="{% url 'polls:reports' %}">Reports</a></li>
         </ul>
     </div>
 

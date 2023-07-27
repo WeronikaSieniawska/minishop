@@ -6,24 +6,6 @@ document.addEventListener('DOMContentLoaded', function () {
       tabContents.forEach(content => {
         content.style.display = content.id === tabId ? 'block' : 'none';
       });
-  
-      // Przekierowanie użytkownika na odpowiedni adres URL na podstawie tabId
-      switch (tabId) {
-        case 'invoice-of-sales':
-          window.location.href = "{% url 'polls:invoice_of_sales' %}";
-          break;
-        case 'purchase-order':
-          window.location.href = "{% url 'polls:purchase_order' %}";
-          break;
-        case 'income-and-expenditure':
-          window.location.href = "{% url 'polls:income_and_expenditure' %}";
-          break;
-        case 'reports':
-          window.location.href = "{% url 'polls:reports' %}";
-          break;
-        default:
-          break;
-      }
     }
   
     function setActiveTab(link) {
@@ -33,19 +15,29 @@ document.addEventListener('DOMContentLoaded', function () {
       link.classList.add('active');
     }
   
+    function handleTabClick(link) {
+      const tabId = link.dataset.tab;
+      showTabContent(tabId);
+      setActiveTab(link);
+  
+      // Aktualizacja adresu URL w zależności od wybranej zakładki
+      const currentURL = window.location.href;
+      const baseURL = currentURL.split('?')[0];
+      const newURL = `${baseURL}?tab=${tabId}`;
+      window.history.pushState({ path: newURL }, '', newURL);
+    }
+  
     tabLinks.forEach(link => {
       link.addEventListener('click', () => {
-        const tabId = link.dataset.tab;
-        showTabContent(tabId);
-        setActiveTab(link);
+        handleTabClick(link);
       });
     });
   
-    // Get the current URL path and extract the active tab from it
-    const currentPath = window.location.pathname;
-    const activeTabId = currentPath.split('/').pop();
+    // Pobranie aktywnej zakładki z adresu URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeTabId = urlParams.get('tab');
   
-    // Show the content for the active tab and set it as active
+    // Pokaż zawartość dla aktywnej zakładki i ustaw ją jako aktywną
     const activeTab = document.querySelector(`[data-tab="${activeTabId}"]`);
     if (activeTab) {
       showTabContent(activeTabId);

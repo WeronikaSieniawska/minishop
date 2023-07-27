@@ -24,9 +24,20 @@ body {
   cursor: pointer;
 }
 
+/* Styl dla nieaktywnych linków w sidebar */
+.sidebar li a {
+  text-decoration: none; /* Usunięcie podkreślenia linków */
+  color: black; /* Ustawienie koloru dla nieaktywnych linków */
+}
+
+/* Styl dla aktywnych linków w sidebar */
+.sidebar li.active a {
+  text-decoration: none;
+  color: black; /* Ustawienie koloru dla aktywnych linków */
+}
+
 .sidebar li.active {
   background-color: #4CAF50;
-  color: white;
 }
 
 .content {
