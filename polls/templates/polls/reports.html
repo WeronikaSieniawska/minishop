@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'polls/css/style.css' %}">
     <title>Invoice App - Reports</title>
 </head>
 
@@ -26,7 +28,7 @@
         </div>
     </div>
 
-    <script src="{% static 'script.js' %}"></script>
+    <script src="{% static 'polls/js/script.js' %}"></script>
 </body>
 
 </html>
