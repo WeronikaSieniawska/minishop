@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <title>Invoice App - Income and Expenditure</title>
+</head>
+
+<body>
+    <div class="sidebar">
+        <ul>
+            <li class="tab-link" data-tab="invoice-of-sales">Invoice of Sales</li>
+            <li class="tab-link" data-tab="purchase-order">Purchase Order</li>
+            <li class="tab-link active" data-tab="income-and-expenditure">Income and Expenditure</li>
+            <li class="tab-link" data-tab="reports">Reports</li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div id="income-and-expenditure" class="tab-content">
+            <!-- Treść zawartości dla zakładki "Income and Expenditure" -->
+            <h2>Income and Expenditure</h2>
+            <p>Tutaj znajduje się zawartość zakładki Income and Expenditure.</p>
+        </div>
+    </div>
+
+    <script src="{% static 'script.js' %}"></script>
+</body>
+
+</html>

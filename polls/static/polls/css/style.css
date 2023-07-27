@@ -1,0 +1,80 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #f1f1f1;
+  padding-top: 20px;
+  position: fixed;
+  height: 100%;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 8px;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.sidebar li.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.content {
+  margin-left: 200px;
+  padding: 20px;
+}
+
+.form {
+  margin-bottom: 20px;
+}
+
+.form label,
+.table h2 {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.form button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.table {
+  overflow-x: auto;
+  display: none; /* Ukrywamy początkowo tabelę */
+}
+
+.table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.table th {
+  background-color: #f2f2f2;
+}

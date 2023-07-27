@@ -6,6 +6,34 @@ from django.utils import timezone
 
 from .models import Choice, Question
 
+from django.views import View
+
+# Widok dla zakładki "Invoice of Sales"
+class InvoiceOfSalesView(View):
+    def get(self, request):
+        # Tutaj możesz dodać odpowiednią logikę dla zakładki "Invoice of Sales"
+        return render(request, 'polls/invoice_of_sales.html')
+
+# Widok dla zakładki "Purchase Order"
+class PurchaseOrderView(View):
+    def get(self, request):
+        # Tutaj możesz dodać odpowiednią logikę dla zakładki "Purchase Order"
+        return render(request, 'polls/purchase_order.html')
+
+# Widok dla zakładki "Income and Expenditure"
+class IncomeAndExpenditureView(View):
+    def get(self, request):
+        # Tutaj możesz dodać odpowiednią logikę dla zakładki "Income and Expenditure"
+        return render(request, 'polls/income_and_expenditure.html')
+
+# Widok dla zakładki "Reports"
+class ReportsView(View):
+    def get(self, request):
+        # Tutaj możesz dodać odpowiednią logikę dla zakładki "Reports"
+        return render(request, 'polls/reports.html')
+
+
+
 class IndexView(generic.ListView):
     template_name = "polls/index.html"
     context_object_name = "latest_question_list"
@@ -57,3 +85,4 @@ def vote(request, question_id):
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
         return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+""
