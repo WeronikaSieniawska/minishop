@@ -24,16 +24,14 @@ body {
   cursor: pointer;
 }
 
-/* Styl dla nieaktywnych linków w sidebar */
 .sidebar li a {
-  text-decoration: none; /* Usunięcie podkreślenia linków */
-  color: black; /* Ustawienie koloru dla nieaktywnych linków */
+  text-decoration: none; 
+  color: black; 
 }
 
-/* Styl dla aktywnych linków w sidebar */
 .sidebar li.active a {
   text-decoration: none;
-  color: black; /* Ustawienie koloru dla aktywnych linków */
+  color: black; 
 }
 
 .sidebar li.active {
@@ -52,7 +50,7 @@ body {
 .form label,
 .table h2 {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 35px;
 }
 
 .form input {
@@ -61,12 +59,30 @@ body {
   margin-bottom: 10px;
 }
 
+/*
 .form button {
   background-color: #4CAF50;
-  color: white;
-  padding: 8px 16px;
+  color: #4CAF50;
+  padding: 30px 30px;
   border: none;
   cursor: pointer;
+}
+*/
+
+button {
+  background-color: #4CAF50;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 5px; 
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s; 
+  margin: 2%;
+
+}
+
+button:hover {
+  background-color: #357743; 
 }
 
 .table {
