@@ -22,7 +22,6 @@
 
     <div class="content">
         <div id="purchase-order" class="tab-content">
-            <!-- Treść zawartości dla zakładki "Purchase Order" -->
             <h2>Purchase Order</h2>
             <form>
                 <label for="clientName">Suppliers:</label>
@@ -52,13 +51,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Tabela z dynamicznie wczytywanymi danymi -->
-                </tbody>
+                    {% for item in inventory_data %}
+                    <tr>
+                      <td>{{ item.item }}</td>
+                      <td>{{ item.description }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td>{{ item.purchasePrice }}</td>
+                      <td class="total_amount">{{ item.totalAmount }}</td> 
+                      <td>
+                        <input type="number" class="amountInput" data-item-id="{{ forloop.counter }}"
+                            min="0" max="{{ item.quantity }}" value="0">
+                        <span class="error-message"></span>
+                    </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
             </table>
+            
+            <script src="{% static 'polls/js/script.js' %}"></script>
+
         </div>
     </div>
 
-    <script href="{% static 'polls/js/script.js' %}"></script>
 </body>
-
 </html>
