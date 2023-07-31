@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-
   function updateTotalAmounts() {
     const rows = document.querySelectorAll('tbody tr');
     rows.forEach(row => {
@@ -18,10 +17,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalAmountCell = document.querySelector(`[data-item-id="${itemId}"] .total_amount`);
     const unitPrice = parseFloat(document.querySelector(`[data-item-id="${itemId}"] td:nth-child(4)`).textContent);
 
-    // Check if Amount exceeds Quantity and display error message if it does
     const quantity = parseInt(document.querySelector(`[data-item-id="${itemId}"] td:nth-child(3)`).textContent, 10);
     const errorMessage = document.querySelector(`[data-item-id="${itemId}"] .error-message`);
-    if (amount > quantity) {
+
+    if (isNaN(amount) || amount < 0) {
+      errorMessage.textContent = 'Invalid input';
+      totalAmountCell.textContent = (0).toFixed(2);
+    } else if (amount > quantity) {
       errorMessage.textContent = `Exceeded quantity (${quantity})`;
       totalAmountCell.textContent = (quantity * unitPrice).toFixed(2);
     } else {
@@ -45,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
         totalOrderAmount += totalAmount;
       }
     });
-    const totalAmountField = document.getElementById('totalAmount');
+    const totalAmountField = document.getElementById('total');
     totalAmountField.value = totalOrderAmount.toFixed(2);
   }
 
@@ -57,7 +59,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Calculate Total Order Amount on Calculate Total button click
   const calculateButton = document.getElementById('calculateButton');
-  calculateButton.addEventListener('click', updateTotalOrderAmount);
+  calculateButton.addEventListener('click', function () {
+    updateTotalOrderAmount();
+  });
 
   // Call updateTotalAmounts on page load
   updateTotalAmounts();

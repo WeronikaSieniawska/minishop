@@ -1,3 +1,4 @@
+<!-- purchase_order.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,29 +22,31 @@
     </div>
 
     <div class="content">
-        <div id="purchase-order" class="tab-content">
+        <div id="invoice-of-sales" class="tab-content">
             <h2>Purchase Order</h2>
             <form>
-                <label for="clientName">Suppliers:</label>
+                <label for="clientName">Supplier:</label>
                 <input type="text" id="clientName">
 
                 <label for="invoiceDate">Date:</label>
                 <input type="date" id="invoiceDate" value="2023-07-25">
 
-                </br>
+                <br>
 
                 <label for="totalAmount">Total order amount:</label>
-                <input type="text" id="totalAmount" disabled>
+                <input type="text" id="totalAmount" disabled value="0">
+
+                <button type="button" id="calculateButton">Calculate Total</button>
 
                 <button type="button" id="saveButton">Save</button>
             </form>
 
             <h2>Items</h2>
-            <table>
+            <table class="item">
                 <thead>
                     <tr>
-                        <th>Items</th>
-                        <th>Descriptions</th>
+                        <th>Item name</th>
+                        <th>Description</th>
                         <th>Quantity</th>
                         <th>Unit Price</th>
                         <th>Total Amount</th>
@@ -53,23 +56,23 @@
                 <tbody>
                     {% for item in inventory_data %}
                     <tr>
-                      <td>{{ item.item }}</td>
-                      <td>{{ item.description }}</td>
-                      <td>{{ item.quantity }}</td>
-                      <td>{{ item.purchasePrice }}</td>
-                      <td class="total_amount">{{ item.totalAmount }}</td> 
-                      <td>
-                        <input type="number" class="amountInput" data-item-id="{{ forloop.counter }}"
-                            min="0" max="{{ item.quantity }}" value="0">
-                        <span class="error-message"></span>
-                    </td>
+                        <td>{{ item.item }}</td>
+                        <td>{{ item.description }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.purchasePrice }}</td>
+                        <td class="total_amount">{{ item.totalAmount }}</td>
+                        <td>
+                            <input type="number" class="amountInput" data-item-id="{{ forloop.counter }}"
+                                min="0" max="{{ item.quantity }}" value="0">
+                            <span class="error-message"></span>
+                        </td>
                     </tr>
                     {% endfor %}
-                  </tbody>
+                </tbody>
             </table>
+            <div id="errorMessages"></div>
             
             <script src="{% static 'polls/js/script.js' %}"></script>
-
         </div>
     </div>
 

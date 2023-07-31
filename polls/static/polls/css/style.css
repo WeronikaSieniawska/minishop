@@ -1,106 +1,116 @@
-body {
+/* style.css */
+
+/* Resetowanie styli dla całej strony */
+body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, form, input, button, table, th, td {
   margin: 0;
   padding: 0;
+  border: 0;
   font-family: Arial, sans-serif;
 }
 
+/* Ustawienie tła dla całej strony */
+body {
+  background-color: #f2f2f2;
+}
+
+/* Styl dla głównego kontenera */
+.content {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Styl dla bocznego paska nawigacji */
 .sidebar {
+  background-color: #333;
+  color: #fff;
   width: 200px;
-  background-color: #f1f1f1;
-  padding-top: 20px;
+  height: 100vh;
   position: fixed;
-  height: 100%;
+  top: 0;
+  left: 0;
+  padding-top: 20px;
 }
 
 .sidebar ul {
-  list-style-type: none;
-  padding: 0;
+  list-style: none;
 }
 
 .sidebar li {
-  padding: 8px;
-  text-align: center;
-  font-weight: bold;
-  cursor: pointer;
+  margin-bottom: 10px;
 }
 
-.sidebar li a {
-  text-decoration: none; 
-  color: black; 
-}
-
-.sidebar li.active a {
+.sidebar a {
+  color: #fff;
   text-decoration: none;
-  color: black; 
+  display: block;
+  padding: 10px;
 }
 
-.sidebar li.active {
-  background-color: #4CAF50;
+.sidebar a:hover {
+  background-color: #555;
 }
 
-.content {
-  margin-left: 200px;
+/* Styl dla zawartości */
+.tab-content {
+  margin-left: 220px;
   padding: 20px;
 }
 
-.form {
+h2 {
   margin-bottom: 20px;
 }
 
-.form label,
-.table h2 {
-  display: block;
-  margin-bottom: 35px;
+form {
+  margin-bottom: 20px;
 }
 
-.form input {
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="number"] {
   width: 100%;
   padding: 8px;
   margin-bottom: 10px;
 }
 
-button {
-  background-color: #4CAF50;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 5px; 
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s; 
-  margin: 2%;
-}
-
-button:hover {
-  background-color: #357743; 
-}
-
-.item {
-  overflow-x: auto;
-  width: 80%;
+table {
+  width: 100%;
   border-collapse: collapse;
 }
 
-.item th,
-.item td {
-  border: 1px solid #ddd;
-  padding: 12px 8px;
+th,
+td {
+  padding: 8px;
   text-align: left;
 }
 
-.item th {
+th {
+  background-color: #333;
+  color: #fff;
+}
+
+tr:nth-child(even) {
   background-color: #f2f2f2;
-  font-weight: bold;
 }
 
-.item tr:nth-child(even) {
-  background-color: #f2f2f2;
+button {
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  cursor: pointer;
 }
 
-.item tr:hover {
-  background-color: #ddd;
+button:hover {
+  background-color: #555;
 }
 
-input[type="number"] {
-  width: 70px;
-  text-align: right;
+.error-message {
+  color: red;
+  font-size: 14px;
 }

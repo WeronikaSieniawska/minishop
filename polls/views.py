@@ -15,8 +15,8 @@ class InvoiceOfSalesView(View):
 # Widok dla zakładki "Purchase Order"
 class PurchaseOrderView(View):
     def get(self, request):
-        # Tutaj możesz dodać odpowiednią logikę dla zakładki "Purchase Order"
-        return render(request, 'polls/purchase_order.html')
+        inventory_data = Inventory.objects.all()
+        return render(request, 'polls/purchase_order.html', {'inventory_data': inventory_data})
 
 # Widok dla zakładki "Income and Expenditure"
 class IncomeAndExpenditureView(View):

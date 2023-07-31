@@ -30,10 +30,10 @@
                 <label for="invoiceDate">Date:</label>
                 <input type="date" id="invoiceDate" value="2023-07-25">
 
-                </br>
+                <br>
 
-                <label for="totalAmount">Total order amount:</label>
-                <input type="text" id="totalAmount" disabled value="0">
+                <label for="total">Total order amount:</label>
+                <input type="text" id="total" value="0">
 
                 <button type="button" id="calculateButton">Calculate Total</button>
 
@@ -53,24 +53,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                  {% for item in inventory_data %}
-                  <tr>
-                    <td>{{ item.item }}</td>
-                    <td>{{ item.description }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.salePrice }}</td>
-                    <td class="total_amount">{{ item.totalAmount }}</td> 
-                    <td>
-                      <input type="number" class="amountInput" data-item-id="{{ forloop.counter }}"
-                          min="0" max="{{ item.quantity }}" value="0">
-                      <span class="error-message"></span>
-                  </td>
-                  </tr>
-                  {% endfor %}
+                    {% for item in inventory_data %}
+                    <tr>
+                        <td>{{ item.item }}</td>
+                        <td>{{ item.description }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.salePrice }}</td>
+                        <td class="total_amount">{{ item.totalAmount }}</td>
+                        <td>
+                            <input type="number" class="amountInput" data-item-id="{{ forloop.counter }}"
+                                min="0" max="{{ item.quantity }}" value="0">
+                            <span class="error-message"></span>
+                        </td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
             <div id="errorMessages"></div>
-            
+
             <script src="{% static 'polls/js/script.js' %}"></script>
         </div>
     </div>
