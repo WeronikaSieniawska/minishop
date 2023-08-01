@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function () {
   function updateTotalAmounts() {
     const rows = document.querySelectorAll('tbody tr');
@@ -13,56 +14,70 @@ document.addEventListener('DOMContentLoaded', function () {
   function handleAmountInputChange(event) {
     const input = event.target;
     const amount = parseFloat(input.value);
-    const itemId = input.dataset.itemId;
-    const totalAmountCell = document.querySelector(`[data-item-id="${itemId}"] .total_amount`);
-    const unitPrice = parseFloat(document.querySelector(`[data-item-id="${itemId}"] td:nth-child(4)`).textContent);
 
-    const quantity = parseInt(document.querySelector(`[data-item-id="${itemId}"] td:nth-child(3)`).textContent, 10);
-    const errorMessage = document.querySelector(`[data-item-id="${itemId}"] .error-message`);
+    if (!isNaN(amount)) {
+        const itemId = input.dataset.itemId;
+        const totalAmountCell = document.querySelector(`[data-item-id="${itemId}"] .total_amount`);
+        const unitPriceElement = document.querySelector(`[data-item-id="${itemId}"] td:nth-child(4)`);
+        const quantityElement = document.querySelector(`[data-item-id="${itemId}"] td:nth-child(3)`);
 
-    if (isNaN(amount) || amount < 0) {
-      errorMessage.textContent = 'Invalid input';
-      totalAmountCell.textContent = (0).toFixed(2);
-    } else if (amount > quantity) {
-      errorMessage.textContent = `Exceeded quantity (${quantity})`;
-      totalAmountCell.textContent = (quantity * unitPrice).toFixed(2);
-    } else {
-      errorMessage.textContent = '';
-      const totalAmount = amount * unitPrice;
-      totalAmountCell.textContent = totalAmount.toFixed(2);
+        const unitPrice = unitPriceElement ? parseFloat(unitPriceElement.textContent) : 0;
+        const quantity = quantityElement ? parseInt(quantityElement.textContent, 10) : 0;
+
+        const errorMessage = document.querySelector(`[data-item-id="${itemId}"] .error-message`);
+
+        if (errorMessage) {
+            if (isNaN(amount) || amount < 0) {
+                errorMessage.textContent = 'Invalid input';
+                totalAmountCell.textContent = '0.00';
+            } else if (amount > quantity) {
+                errorMessage.textContent = `Exceeded quantity (${quantity})`;
+                totalAmountCell.textContent = (quantity * unitPrice).toFixed(2);
+            } else {
+                errorMessage.textContent = '';
+                const totalAmount = amount * unitPrice;
+                totalAmountCell.textContent = totalAmount.toFixed(2);
+            }
+        }
+
+        updateTotalOrderAmount();
     }
+}
 
-    updateTotalOrderAmount();
-  }
-
-  function updateTotalOrderAmount() {
+function updateTotalOrderAmount() {
     const amountInputs = document.querySelectorAll('.amountInput');
     let totalOrderAmount = 0;
+
     amountInputs.forEach(input => {
-      const amount = parseFloat(input.value);
-      if (!isNaN(amount)) {
-        const itemId = input.dataset.itemId;
-        const unitPrice = parseFloat(document.querySelector(`[data-item-id="${itemId}"] td:nth-child(4)`).textContent);
-        const totalAmount = amount * unitPrice;
-        totalOrderAmount += totalAmount;
-      }
+        const amount = parseFloat(input.value);
+        if (!isNaN(amount)) {
+            const itemId = input.dataset.itemId;
+            const unitPriceElement = document.querySelector(`[data-item-id="${itemId}"] td:nth-child(4)`);
+
+            if (unitPriceElement) {
+                const unitPrice = parseFloat(unitPriceElement.textContent);
+                const totalAmount = amount * unitPrice;
+                totalOrderAmount += totalAmount;
+            }
+        }
     });
+
     const totalAmountField = document.getElementById('total');
-    totalAmountField.value = totalOrderAmount.toFixed(2);
-  }
+    totalAmountField.value = totalOrderAmount.toFixed(2); // Zmieniony .textContent na .value
+}
 
-  // Listen for input changes in the amount fields
-  const amountInputs = document.querySelectorAll('.amountInput');
-  amountInputs.forEach(input => {
+// Listen for input changes in the amount fields
+const amountInputs = document.querySelectorAll('.amountInput');
+amountInputs.forEach(input => {
     input.addEventListener('input', handleAmountInputChange);
-  });
+});
 
-  // Calculate Total Order Amount on Calculate Total button click
-  const calculateButton = document.getElementById('calculateButton');
-  calculateButton.addEventListener('click', function () {
+// Calculate Total Order Amount on Calculate Total button click
+const calculateButton = document.getElementById('calculateButton');
+calculateButton.addEventListener('click', function () {
     updateTotalOrderAmount();
-  });
+});
 
-  // Call updateTotalAmounts on page load
-  updateTotalAmounts();
+// Call updateTotalAmounts on page load
+updateTotalAmounts();
 });
