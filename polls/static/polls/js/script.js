@@ -1,3 +1,12 @@
+function getCSRFToken() {
+  const csrfCookie = document.cookie.split(';').find(cookie => cookie.trim().startsWith('csrftoken='));
+  if (csrfCookie) {
+    return csrfCookie.split('=')[1];
+  } else {
+    return null;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   function updateTotalAmounts() {
     const rows = document.querySelectorAll('tbody tr');
@@ -59,45 +68,8 @@ document.addEventListener('DOMContentLoaded', function () {
     totalAmountField.value = totalOrderAmount.toFixed(2);
   }
 
-  function saveCustomerItems() {
-    const customerInput = document.getElementById('customerInput');
-    const invoiceDate = document.getElementById('invoiceDate');
-    const totalAmountField = document.getElementById('total');
-
-    const customer = customerInput.value.trim();
-    const date = invoiceDate.value;
-    const totalAmount = parseFloat(totalAmountField.value);
-
-    if (!customer) {
-      showError("Please provide a customer name.");
-      return;
-    }
-
-    if (!date) {
-      showError("Please provide an invoice date.");
-      return;
-    }
-
-    if (isNaN(totalAmount) || totalAmount <= 0) {
-      showError("Please provide a valid total amount.");
-      return;
-    }
-
-    const items = [];
-    const amountInputs = document.querySelectorAll('.amountInput');
-    amountInputs.forEach(input => {
-      const itemId = input.dataset.itemId;
-      const amount = parseFloat(input.value);
-      if (!isNaN(amount) && amount > 0) {
-        items.push({ item_id: itemId, amount: amount });
-      }
-    });
-
-    if (items.length === 0) {
-      showError("Please provide at least one valid item amount.");
-      return;
-    }
-
+  function saveInvoice(customer, date, totalAmount, items) {
+    // Zapisujemy fakturę i jej elementy do bazy danych
     const data = {
       customer: customer,
       iPubDate: date,
@@ -113,18 +85,108 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       body: JSON.stringify(data),
     })
-    .then(response => response.json())
-    .then(data => {
-      if (data.error) {
-        showError(data.error);
-      } else {
-        showSuccess(data.message);
-        window.location.href = '/income-and-expenditure/';
-      }
-    })
-    .catch(error => {
-      showError("An error occurred. Please try again.");
-    });
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          showError(data.error);
+        } else {
+          showSuccess(data.message);
+          window.location.href = '/income-and-expenditure/';
+        }
+      })
+      .catch(error => {
+        showError("An error occurred while saving the invoice. Please try again.");
+      });
+  }
+
+  function saveCustomerItems() {
+    const customerInput = document.getElementById('customerInput');
+    const invoiceDate = document.getElementById('invoiceDate');
+    const totalAmountField = document.getElementById('total');
+  
+    const customer = customerInput.value.trim();
+    const date = invoiceDate.value;
+    const totalAmount = parseFloat(totalAmountField.value);
+  
+    if (!customer) {
+      showError("Please provide a customer name.");
+      return;
+    }
+  
+    if (!date) {
+      showError("Please provide an invoice date.");
+      return;
+    }
+  
+    if (isNaN(totalAmount) || totalAmount <= 0) {
+      showError("Please provide a valid total amount.");
+      return;
+    }
+  
+    // Sprawdzenie, czy klient o podanej nazwie istnieje w bazie danych
+    fetch(`/check_customer_exists/?name=${encodeURIComponent(customer)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (!data.exists) {
+          // Jeśli klient nie istnieje, dodajemy nowy rekord do tabeli Customers
+          fetch('/add_customer/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify({ customer: customer }),
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.error) {
+                showError("An error occurred while adding the customer to the database.");
+              } else {
+                // Po dodaniu klienta, zapisujemy fakturę
+                const items = [];
+                const amountInputs = document.querySelectorAll('.amountInput');
+                amountInputs.forEach(input => {
+                  const itemId = input.dataset.itemId;
+                  const amount = parseFloat(input.value);
+                  if (!isNaN(amount) && amount > 0) {
+                    items.push({ item_id: itemId, amount: amount });
+                  }
+                });
+  
+                if (items.length === 0) {
+                  showError("Please provide at least one valid item amount greater than 0.");
+                  return;
+                }
+  
+                saveInvoice(customer, date, totalAmount, items);
+              }
+            })
+            .catch(error => {
+              showError("An error occurred while adding the customer to the database.");
+            });
+        } else {
+          // Jeśli klient istnieje, zapisujemy po prostu fakturę
+          const items = [];
+          const amountInputs = document.querySelectorAll('.amountInput');
+          amountInputs.forEach(input => {
+            const itemId = input.dataset.itemId;
+            const amount = parseFloat(input.value);
+            if (!isNaN(amount) && amount > 0) {
+              items.push({ item_id: itemId, amount: amount });
+            }
+          });
+  
+          if (items.length === 0) {
+            showError("Please provide at least one valid item amount greater than 0.");
+            return;
+          }
+  
+          saveInvoice(customer, date, totalAmount, items);
+        }
+      })
+      .catch(error => {
+        showError("An error occurred while checking if the customer exists.");
+      });
   }
 
   function showError(message) {

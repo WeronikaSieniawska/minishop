@@ -67,10 +67,18 @@
                         <td>{{ item.salePrice }}</td>
                         <td class="total_amount">{{ item.totalAmount }}</td>
                         <td>
-                            <input type="number" class="amountInput" data-item-id="{{ item.id }}"
-                                min="0" max="{{ item.quantity }}" value="{{ item.amount }}">
+                            <input
+                              type="number"
+                              class="amountInput"
+                              data-item-id="{{ item.id }}"
+                              data-item-quantity="{{ item.quantity }}"
+                              min="0"
+                              max="{{ item.quantity }}"
+                              name="amount_{{ item.id }}"
+                              value="{{ item.amount }}"
+                            >
                             <span class="error-message"></span>
-                        </td>
+                          </td>
                     </tr>
                     {% endfor %}
                 </tbody>

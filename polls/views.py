@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views import View
 from django.http import JsonResponse
 from .models import Inventory, Customers, Invoice, CustomerItems
@@ -18,7 +18,8 @@ class InvoiceOfSalesView(View):
             invoice_date = request.POST.get('iPubDate')
             total_amount = request.POST.get('iTotal')
 
-            customer = Customers.objects.get(cName=customer_name)
+            customer, created = Customers.objects.get_or_create(cName=customer_name)
+
             invoice = Invoice(customer=customer, iPubDate=invoice_date, iTotal=total_amount, iComplete=False)
             invoice.save()
 
@@ -29,9 +30,9 @@ class InvoiceOfSalesView(View):
                     customer_item.save()
 
         return JsonResponse({'status': 'success'})
-    
-def saveCustomerItems(request):
-    if request.method == "POST":
+
+class SaveCustomerItemsView(View):
+    def post(self, request):
         data = json.loads(request.body)
         customer_name = data.get('customer')
         invoice_date = data.get('iPubDate')
@@ -47,10 +48,7 @@ def saveCustomerItems(request):
         if not total_amount:
             return JsonResponse({'error': 'Please provide a total amount.'}, status=400)
 
-        try:
-            customer = Customers.objects.get(cName=customer_name)
-        except Customers.DoesNotExist:
-            return JsonResponse({'error': 'Customer does not exist.'}, status=404)
+        customer, created = Customers.objects.get_or_create(cName=customer_name)
 
         invoice = Invoice(customer=customer, iPubDate=invoice_date, iTotal=total_amount, iComplete=False)
         invoice.save()
@@ -59,7 +57,7 @@ def saveCustomerItems(request):
             item_id = item_data.get('item_id')
             amount = item_data.get('amount')
 
-            if item_id and amount:
+            if item_id and amount and amount >= 1:
                 try:
                     item = Inventory.objects.get(id=item_id)
                 except Inventory.DoesNotExist:
@@ -70,8 +68,6 @@ def saveCustomerItems(request):
 
         return JsonResponse({'message': 'Customer items saved successfully.'})
 
-    return JsonResponse({'error': 'Invalid request method.'}, status=405)
-    
 class PurchaseOrderView(View):
     def get(self, request):
         inventory_data = Inventory.objects.all()
@@ -86,3 +82,26 @@ class IncomeAndExpenditureView(View):
 class ReportsView(View):
     def get(self, request):
         return render(request, 'polls/reports.html')
+
+class AddCustomerView(View):
+    def post(self, request):
+        data = json.loads(request.body)
+        customer_name = data.get('customer')
+
+        if not customer_name:
+            return JsonResponse({'error': 'Please provide a customer name.'}, status=400)
+
+        customer, created = Customers.objects.get_or_create(cName=customer_name)
+
+        return JsonResponse({'message': 'Customer added successfully.', 'customer_id': customer.id})
+
+class CheckCustomerExistsView(View):
+    def get(self, request):
+        customer_name = request.GET.get('name')
+        
+        if not customer_name:
+            return JsonResponse({'error': 'Please provide a customer name.'}, status=400)
+
+        customer = Customers.objects.filter(cName=customer_name).exists()
+
+        return JsonResponse({'exists': customer})
