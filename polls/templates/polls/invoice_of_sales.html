@@ -23,17 +23,23 @@
     <div class="content">
         <div id="invoice-of-sales" class="tab-content">
             <h2>Invoice of Sales</h2>
-            <form>
-                <label for="clientName">Customer:</label>
-                <input type="text" id="clientName">
+            <form method="post">
+                {% csrf_token %}
+                <label for="customerInput">Customer:</label>
+                <input type="text" id="customerInput" list="customerList" name="customer">
+                <datalist id="customerList">
+                    {% for customer in customers %}
+                        <option value="{{ customer.cName }}">
+                    {% endfor %}
+                </datalist>
 
                 <label for="invoiceDate">Date:</label>
-                <input type="date" id="invoiceDate" value="2023-07-25">
+                <input type="date" id="invoiceDate" name="iPubDate" value="{{ current_date }}">
 
                 <br>
 
                 <label for="total">Total order amount:</label>
-                <input type="text" id="total" value="0">
+                <input type="text" id="total" name="iTotal" value="0">
 
                 <button type="button" id="calculateButton">Calculate Total</button>
 
@@ -61,17 +67,15 @@
                         <td>{{ item.salePrice }}</td>
                         <td class="total_amount">{{ item.totalAmount }}</td>
                         <td>
-                            <input type="number" class="amountInput" data-item-id="{{ forloop.counter }}"
-                                min="0" max="{{ item.quantity }}" value="0">
+                            <input type="number" class="amountInput" data-item-id="{{ item.id }}"
+                                min="0" max="{{ item.quantity }}" value="{{ item.amount }}">
                             <span class="error-message"></span>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            <div id="errorMessages"></div>
-
-            <script src="{% static 'polls/js/script.js' %}"></script>
+            <div id="errorMessage" class="error-message"></div>
         </div>
     </div>
     <script src="{% static 'polls/js/script.js' %}"></script>

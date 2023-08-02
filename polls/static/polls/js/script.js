@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function () {
   function updateTotalAmounts() {
     const rows = document.querySelectorAll('tbody tr');
@@ -16,68 +15,142 @@ document.addEventListener('DOMContentLoaded', function () {
     const amount = parseFloat(input.value);
 
     if (!isNaN(amount)) {
-        const itemId = input.dataset.itemId;
-        const totalAmountCell = document.querySelector(`[data-item-id="${itemId}"] .total_amount`);
+      const itemId = input.dataset.itemId;
+      const totalAmountCell = document.querySelector(`[data-item-id="${itemId}"] .total_amount`);
+
+      if (totalAmountCell) {
         const unitPriceElement = document.querySelector(`[data-item-id="${itemId}"] td:nth-child(4)`);
         const quantityElement = document.querySelector(`[data-item-id="${itemId}"] td:nth-child(3)`);
 
         const unitPrice = unitPriceElement ? parseFloat(unitPriceElement.textContent) : 0;
         const quantity = quantityElement ? parseInt(quantityElement.textContent, 10) : 0;
 
-        const errorMessage = document.querySelector(`[data-item-id="${itemId}"] .error-message`);
-
-        if (errorMessage) {
-            if (isNaN(amount) || amount < 0) {
-                errorMessage.textContent = 'Invalid input';
-                totalAmountCell.textContent = '0.00';
-            } else if (amount > quantity) {
-                errorMessage.textContent = `Exceeded quantity (${quantity})`;
-                totalAmountCell.textContent = (quantity * unitPrice).toFixed(2);
-            } else {
-                errorMessage.textContent = '';
-                const totalAmount = amount * unitPrice;
-                totalAmountCell.textContent = totalAmount.toFixed(2);
-            }
+        if (amount > quantity) {
+          totalAmountCell.textContent = (quantity * unitPrice).toFixed(2);
+        } else {
+          const totalAmount = amount * unitPrice;
+          totalAmountCell.textContent = totalAmount.toFixed(2);
         }
 
         updateTotalOrderAmount();
+      }
     }
-}
+  }
 
-function updateTotalOrderAmount() {
+  function updateTotalOrderAmount() {
     const amountInputs = document.querySelectorAll('.amountInput');
     let totalOrderAmount = 0;
 
     amountInputs.forEach(input => {
-        const amount = parseFloat(input.value);
-        if (!isNaN(amount)) {
-            const itemId = input.dataset.itemId;
-            const unitPriceElement = document.querySelector(`[data-item-id="${itemId}"] td:nth-child(4)`);
+      const amount = parseFloat(input.value);
+      if (!isNaN(amount)) {
+        const itemId = input.dataset.itemId;
+        const unitPriceElement = document.querySelector(`[data-item-id="${itemId}"] td:nth-child(4)`);
 
-            if (unitPriceElement) {
-                const unitPrice = parseFloat(unitPriceElement.textContent);
-                const totalAmount = amount * unitPrice;
-                totalOrderAmount += totalAmount;
-            }
+        if (unitPriceElement) {
+          const unitPrice = parseFloat(unitPriceElement.textContent);
+          const totalAmount = amount * unitPrice;
+          totalOrderAmount += totalAmount;
         }
+      }
     });
 
     const totalAmountField = document.getElementById('total');
-    totalAmountField.value = totalOrderAmount.toFixed(2); // Zmieniony .textContent na .value
-}
+    totalAmountField.value = totalOrderAmount.toFixed(2);
+  }
 
-// Listen for input changes in the amount fields
-const amountInputs = document.querySelectorAll('.amountInput');
-amountInputs.forEach(input => {
+  function saveCustomerItems() {
+    const customerInput = document.getElementById('customerInput');
+    const invoiceDate = document.getElementById('invoiceDate');
+    const totalAmountField = document.getElementById('total');
+
+    const customer = customerInput.value.trim();
+    const date = invoiceDate.value;
+    const totalAmount = parseFloat(totalAmountField.value);
+
+    if (!customer) {
+      showError("Please provide a customer name.");
+      return;
+    }
+
+    if (!date) {
+      showError("Please provide an invoice date.");
+      return;
+    }
+
+    if (isNaN(totalAmount) || totalAmount <= 0) {
+      showError("Please provide a valid total amount.");
+      return;
+    }
+
+    const items = [];
+    const amountInputs = document.querySelectorAll('.amountInput');
+    amountInputs.forEach(input => {
+      const itemId = input.dataset.itemId;
+      const amount = parseFloat(input.value);
+      if (!isNaN(amount) && amount > 0) {
+        items.push({ item_id: itemId, amount: amount });
+      }
+    });
+
+    if (items.length === 0) {
+      showError("Please provide at least one valid item amount.");
+      return;
+    }
+
+    const data = {
+      customer: customer,
+      iPubDate: date,
+      iTotal: totalAmount,
+      items: items,
+    };
+
+    fetch('/save_customer_items/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken(),
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        showError(data.error);
+      } else {
+        showSuccess(data.message);
+        window.location.href = '/income-and-expenditure/';
+      }
+    })
+    .catch(error => {
+      showError("An error occurred. Please try again.");
+    });
+  }
+
+  function showError(message) {
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = message;
+    errorMessage.style.color = 'red';
+  }
+
+  function showSuccess(message) {
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = message;
+    errorMessage.style.color = 'green';
+  }
+
+  // Listen for input changes in the amount fields
+  const amountInputs = document.querySelectorAll('.amountInput');
+  amountInputs.forEach(input => {
     input.addEventListener('input', handleAmountInputChange);
-});
+  });
 
-// Calculate Total Order Amount on Calculate Total button click
-const calculateButton = document.getElementById('calculateButton');
-calculateButton.addEventListener('click', function () {
-    updateTotalOrderAmount();
-});
+  // Call updateTotalAmounts on page load
+  updateTotalAmounts();
 
-// Call updateTotalAmounts on page load
-updateTotalAmounts();
+  // Calculate total and save customer items on button click
+  const calculateButton = document.getElementById('calculateButton');
+  const saveButton = document.getElementById('saveButton');
+  calculateButton.addEventListener('click', updateTotalOrderAmount);
+  saveButton.addEventListener('click', saveCustomerItems);
 });

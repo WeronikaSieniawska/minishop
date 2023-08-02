@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Inventory, Suppliers, Customers, Invoice, PurchaseOrder
+from .models import Inventory, Suppliers, Customers, Invoice, PurchaseOrder, CustomerItems
 
 # Rejestracja modeli w panelu administracyjnym
 
@@ -23,9 +23,12 @@ class InvoiceAdmin(admin.ModelAdmin):
 class PurchaseOrderAdmin(admin.ModelAdmin):
     list_display = ('supplier', 'pubDate', 'total', 'complete')
 
+@admin.register(CustomerItems)
+class CustomerItemsAdmin(admin.ModelAdmin):
+    list_display = ('cItem', 'amount')
+
 # Dodatkowe dostosowanie panelu administracyjnego
 
 admin.site.site_header = "Minishop Admin"
 admin.site.site_title = "Minishop Admin Panel"
 admin.site.index_title = "Welcome to Minishop Admin Panel"
-
