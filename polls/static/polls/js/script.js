@@ -47,26 +47,23 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function updateTotalOrderAmount() {
-    const amountInputs = document.querySelectorAll('.amountInput');
+    const rows = document.querySelectorAll('tbody tr');
     let totalOrderAmount = 0;
-
-    amountInputs.forEach(input => {
-      const amount = parseFloat(input.value);
-      if (!isNaN(amount)) {
-        const itemId = input.dataset.itemId;
-        const unitPriceElement = document.querySelector(`[data-item-id="${itemId}"] td:nth-child(4)`);
-
-        if (unitPriceElement) {
-          const unitPrice = parseFloat(unitPriceElement.textContent);
-          const totalAmount = amount * unitPrice;
-          totalOrderAmount += totalAmount;
-        }
+  
+    rows.forEach(row => {
+      const amountInput = row.querySelector('.amountInput');
+      const amount = parseFloat(amountInput.value);
+  
+      if (!isNaN(amount) && amount >= 0) {
+        const unitPrice = parseFloat(row.querySelector('td:nth-child(4)').textContent);
+        const totalAmount = amount * unitPrice;
+        totalOrderAmount += totalAmount;
       }
     });
-
+  
     const totalAmountField = document.getElementById('total');
     totalAmountField.value = totalOrderAmount.toFixed(2);
-  }
+  }  
 
   function saveInvoice(customer, date, totalAmount, items) {
     // Zapisujemy fakturę i jej elementy do bazy danych

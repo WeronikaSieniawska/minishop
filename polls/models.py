@@ -30,7 +30,7 @@ class Customers(models.Model):
 class Invoice(models.Model):
     customer = models.ForeignKey(Customers, on_delete=models.CASCADE)
     iPubDate = models.DateField("date published")
-    iTotal = models.FloatField(default=0, null=False, validators=[MinValueValidator(0.01)])
+    iTotal = models.FloatField(default=0.00, null=False, validators=[MinValueValidator(0.01)])
     iComplete = models.BooleanField()
 
     def __str__(self):

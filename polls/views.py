@@ -30,7 +30,7 @@ class InvoiceOfSalesView(View):
                     customer_item.save()
 
         return JsonResponse({'status': 'success'})
-
+    
 class SaveCustomerItemsView(View):
     def post(self, request):
         data = json.loads(request.body)
@@ -67,7 +67,7 @@ class SaveCustomerItemsView(View):
                 customer_item.save()
 
         return JsonResponse({'message': 'Customer items saved successfully.'})
-
+    
 class PurchaseOrderView(View):
     def get(self, request):
         inventory_data = Inventory.objects.all()
@@ -102,6 +102,9 @@ class CheckCustomerExistsView(View):
         if not customer_name:
             return JsonResponse({'error': 'Please provide a customer name.'}, status=400)
 
-        customer = Customers.objects.filter(cName=customer_name).exists()
+        try:
+            customer = Customers.objects.get(cName=customer_name)
+        except Customers.DoesNotExist:
+            return JsonResponse({'exists': False})
 
-        return JsonResponse({'exists': customer})
+        return JsonResponse({'exists': True, 'customer_id': customer.id})
