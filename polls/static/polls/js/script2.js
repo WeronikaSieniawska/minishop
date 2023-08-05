@@ -58,16 +58,16 @@ function updateTotalOrderAmount() {
   totalAmountField.value = totalOrderAmount.toFixed(2);
 }
 
-function saveInvoice(customer, date, totalAmount, items) {
+function savePurchaseOrder(supplier, date, totalAmount, items) {
   // Zapisujemy fakturę i jej elementy do bazy danych
   const data = {
-    customer: customer,
-    iPubDate: date,
-    iTotal: totalAmount,
+    supplier: supplier,
+    pubDate: date,
+    total: totalAmount,
     items: items,
   };
 
-  fetch('/save_customer_items/', {
+  fetch('/save_supplier_items/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -89,16 +89,16 @@ function saveInvoice(customer, date, totalAmount, items) {
     });
 }
 
-function saveCustomerItems() {
-  const customerInput = document.getElementById('customerInput');
+function saveSupplierItems() {
+  const supplierInput = document.getElementById('supplierInput');
   const invoiceDate = document.getElementById('invoiceDate');
   const totalAmountField = document.getElementById('total');
 
-  const customer = customerInput.value.trim();
+  const supplier = supplierInput.value.trim();
   const date = invoiceDate.value;
   const totalAmount = parseFloat(totalAmountField.value);
 
-  if (!customer) {
+  if (!supplier) {
     showError("Please provide a supplier name.");
     return;
   }
@@ -114,23 +114,23 @@ function saveCustomerItems() {
   }
 
   // Sprawdzenie, czy klient o podanej nazwie istnieje w bazie danych
-  fetch(`/check_customer_exists/?name=${encodeURIComponent(customer)}`)
+  fetch(`/check_supplier_exists/?name=${encodeURIComponent(supplier)}`)
     .then(response => response.json())
     .then(data => {
       if (!data.exists) {
-        // Jeśli klient nie istnieje, dodajemy nowy rekord do tabeli Customers
-        fetch('/add_customer/', {
+        // Jeśli dostawca nie istnieje, dodajemy nowy rekord do tabeli Suppliers
+        fetch('/add_supplier/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCSRFToken(),
           },
-          body: JSON.stringify({ customer: customer }),
+          body: JSON.stringify({ supplier: supplier }),
         })
           .then(response => response.json())
           .then(data => {
             if (data.error) {
-              showError("An error occurred while adding the customer to the database.");
+              showError("An error occurred while adding the supplier to the database.");
             } else {
               // Po dodaniu klienta, zapisujemy fakturę
               const items = [];
@@ -148,14 +148,14 @@ function saveCustomerItems() {
                 return;
               }
 
-              saveInvoice(customer, date, totalAmount, items);
+              savePurchaseOrder(supplier, date, totalAmount, items);
             }
           })
           .catch(error => {
-            showError("An error occurred while adding the customer to the database.");
+            showError("An error occurred while adding the supplier to the database.");
           });
       } else {
-        // Jeśli klient istnieje, zapisujemy po prostu fakturę
+        // Jeśli dostawca istnieje, zapisujemy po prostu fakturę
         const items = [];
         const amountInputs = document.querySelectorAll('.amountInput');
         amountInputs.forEach(input => {
@@ -171,11 +171,11 @@ function saveCustomerItems() {
           return;
         }
 
-        saveInvoice(customer, date, totalAmount, items);
+        savePurchaseOrder(supplier, date, totalAmount, items);
       }
     })
     .catch(error => {
-      showError("An error occurred while checking if the customer exists.");
+      showError("An error occurred while checking if the supplier exists.");
     });
 }
 
@@ -202,9 +202,9 @@ document.addEventListener('DOMContentLoaded', function () {
     input.addEventListener('input', event => handleAmountInputChange(event, quantity));
   });
 
-  // Calculate total and save customer items on button click
+  // Calculate total and save supplier items on button click
   const calculateButton = document.getElementById('calculateButton');
   const saveButton = document.getElementById('saveButton');
   calculateButton.addEventListener('click', updateTotalOrderAmount);
-  saveButton.addEventListener('click',saveCustomerItems);
+  saveButton.addEventListener('click',saveSupplierItems);
 });

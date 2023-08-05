@@ -55,7 +55,7 @@ class PurchaseOrder(models.Model):
 
 class SupplierItems(models.Model):
     purchase = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE)
-    cItem = models.ForeignKey(Inventory, on_delete=models.CASCADE)
+    sItem = models.ForeignKey(Inventory, on_delete=models.CASCADE)
     amount = models.IntegerField(default=0, null=True, blank=True, validators=[MinValueValidator(0)])
 
     def __str__(self):
