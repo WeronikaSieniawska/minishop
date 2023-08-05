@@ -92,6 +92,7 @@ class SaveSupplierItemsView(View):
         invoice_date = data.get('pubDate')
         total_amount = data.get('total')
         items = data.get('items')
+        new_items = data.get('new_items')  # Get new items data
 
         if not supplier_name:
             return JsonResponse({'error': 'Please provide a supplier name.'}, status=400)
@@ -107,6 +108,7 @@ class SaveSupplierItemsView(View):
         invoice = PurchaseOrder(supplier=supplier, pubDate=invoice_date, total=total_amount, complete=False)
         invoice.save()
 
+        # Save existing items
         for item_data in items:
             item_id = item_data.get('item_id')
             amount = item_data.get('amount')
@@ -117,6 +119,32 @@ class SaveSupplierItemsView(View):
                 except Inventory.DoesNotExist:
                     continue
 
+                supplier_item = SupplierItems(purchase=invoice, sItem=item, amount=amount)
+                supplier_item.save()
+
+        # Save new items
+        for new_item_data in new_items:
+            item_id = new_item_data.get('new_item')
+            description = new_item_data.get('new_description')
+            quantity = new_item_data.get('new_quantity', 0)
+            purchase_price = new_item_data.get('new_purchase_price')
+
+            if not item_id or not description or not purchase_price:
+                return JsonResponse({'error': 'Please provide all required item details.'}, status=400)
+
+            try:
+                item = Inventory.objects.get(id=item_id)
+            except Inventory.DoesNotExist:
+                item = Inventory.objects.create(
+                    item=item_id,
+                    description=description,
+                    quantity=quantity,
+                    purchasePrice=purchase_price,
+                    salePrice=0.0,  # You might need to adjust this based on your requirements
+                )
+
+            amount = new_item_data.get('amount')
+            if amount and amount >= 1:
                 supplier_item = SupplierItems(purchase=invoice, sItem=item, amount=amount)
                 supplier_item.save()
 

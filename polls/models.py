@@ -60,3 +60,12 @@ class SupplierItems(models.Model):
 
     def __str__(self):
         return f"Amount: {self.amount}"
+    
+class Orders(models.Model):
+    item = models.TextField(max_length=40, null=False, blank=False)
+    description = models.TextField(max_length=300, null=False, blank=False)
+    quantity = models.IntegerField(default=0, null=False, blank=False, validators=[MinValueValidator(0)])
+    purchasePrice = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0.01)])
+
+    def __str__(self):
+        return self.item

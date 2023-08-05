@@ -41,12 +41,13 @@
                 <input type="text" id="total" name="total" value="0" readonly>
 
                 <button type="button" id="calculateButton">Calculate Total</button>
-
                 <button type="button" id="saveButton">Save</button>
+                <!-- Add new item button -->
+                <button type="button" id="addNewItemButton">Add New Item</button>
             </form>
 
             <h2>Items</h2>
-            <table class="item">
+            <table class="item" id="itemTable">
                 <thead>
                     <tr>
                         <th>Item name</th>
@@ -57,26 +58,26 @@
                         <th>Amount</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="itemTableBody">
                     {% for item in inventory_data %}
-                    <tr>
-                        <td>{{ item.item }}</td>
-                        <td>{{ item.description }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>{{ item.purchasePrice }}</td>
-                        <td class="total_amount"></td>
-                        <td>
-                            <input
-                              type="number"
-                              class="amountInput"
-                              data-item-id="{{ item.id }}"
-                              min="0"
-                              step="1"
-                              name="amount_{{ item.id }}"
-                            >
-                            <span class="error-message"></span>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td>{{ item.item }}</td>
+                            <td>{{ item.description }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.purchasePrice }}</td>
+                            <td class="total_amount"></td>
+                            <td>
+                                <input
+                                    type="number"
+                                    class="amountInput"
+                                    data-item-id="{{ item.id }}"
+                                    min="0"
+                                    step="1"
+                                    name="amount_{{ item.id }}"
+                                >
+                                <span class="error-message"></span>
+                            </td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
