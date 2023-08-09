@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRFToken": getCookie("csrftoken"), // You need to implement this function to get the CSRF token
+                    "X-CSRFToken": getCookie("csrftoken"), 
                 },
                 body: JSON.stringify({ is_completed: isCompleted }),
             })
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRFToken": getCookie("csrftoken"), // You need to implement this function to get the CSRF token
+                    "X-CSRFToken": getCookie("csrftoken"), 
                 },
                 body: JSON.stringify({ is_completed: isCompleted }),
             })
@@ -97,6 +97,40 @@ document.addEventListener("DOMContentLoaded", function () {
                     console.error("Error marking purchase order as completed:", error);
                 });
         });
+    });
+
+    async function refreshView() {
+        const response = await fetch('/income-and-expenditure/');
+        const content = await response.text();
+        const parser = new DOMParser();
+        const newDoc = parser.parseFromString(content, 'text/html');
+        const newContent = newDoc.querySelector('.content');
+        document.querySelector('.content').replaceWith(newContent);
+    }
+
+    // Funkcja do aktualizacji statusu faktury/zamówienia
+    async function updateStatus(statusElement) {
+        const status = statusElement.dataset.status;
+        const itemId = statusElement.dataset.invoiceId || statusElement.dataset.purchaseId;
+        const isCompleted = statusElement.checked;
+
+        const csrfToken = getCSRFToken();
+        await fetch(`/${status}-status/${itemId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({ is_completed: isCompleted }),
+        });
+
+        await refreshView();
+    }
+
+    // Nasłuchiwanie na zmiany w statusie
+    const statusCheckboxes = document.querySelectorAll('.invoice-complete, .purchase-order-complete');
+    statusCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => updateStatus(checkbox));
     });
 
     // Fake API call function for demonstration purposes

@@ -40,6 +40,7 @@ class CustomerItems(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     cItem = models.ForeignKey(Inventory, on_delete=models.CASCADE)
     amount = models.IntegerField(default=0, null=True, blank=True, validators=[MinValueValidator(0)])
+    invoice_item = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Amount: {self.amount}"
@@ -57,6 +58,7 @@ class SupplierItems(models.Model):
     purchase = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE)
     sItem = models.ForeignKey(Inventory, on_delete=models.CASCADE)
     amount = models.IntegerField(default=0, null=True, blank=True, validators=[MinValueValidator(0)])
+    order_item = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Amount: {self.amount}"
@@ -66,6 +68,7 @@ class Orders(models.Model):
     description = models.TextField(max_length=300, null=False, blank=False)
     quantity = models.IntegerField(default=0, null=False, blank=False, validators=[MinValueValidator(0)])
     purchasePrice = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0.01)])
+    salePrice = models.FloatField(default=0, null=False, blank=False, validators=[MinValueValidator(0.01)])
 
     def __str__(self):
         return self.item

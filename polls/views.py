@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import View
 from django.http import JsonResponse
-from .models import Inventory, Customers, Invoice, CustomerItems, Suppliers, SupplierItems, PurchaseOrder
+from .models import Inventory, Customers, Invoice, CustomerItems, Suppliers, SupplierItems, PurchaseOrder, Orders
 from datetime import datetime
 import json
 from rest_framework.views import APIView
@@ -92,7 +92,7 @@ class SaveSupplierItemsView(View):
         invoice_date = data.get('pubDate')
         total_amount = data.get('total')
         items = data.get('items')
-        new_items = data.get('new_items')  # Get new items data
+        new_items = data.get('new_items')
 
         if not supplier_name:
             return JsonResponse({'error': 'Please provide a supplier name.'}, status=400)
@@ -104,8 +104,9 @@ class SaveSupplierItemsView(View):
             return JsonResponse({'error': 'Please provide a total amount.'}, status=400)
 
         supplier, created = Suppliers.objects.get_or_create(sName=supplier_name)
+        pub_date = datetime.strptime(invoice_date, "%d-%m-%Y").strftime("%Y-%m-%d")
 
-        invoice = PurchaseOrder(supplier=supplier, pubDate=invoice_date, total=total_amount, complete=False)
+        invoice = PurchaseOrder(supplier=supplier, pubDate=pub_date, total=total_amount, complete=False)
         invoice.save()
 
         # Save existing items
@@ -122,34 +123,23 @@ class SaveSupplierItemsView(View):
                 supplier_item = SupplierItems(purchase=invoice, sItem=item, amount=amount)
                 supplier_item.save()
 
-        # Save new items
+        # Save new items to Orders table
         for new_item_data in new_items:
             item_id = new_item_data.get('new_item')
             description = new_item_data.get('new_description')
-            quantity = new_item_data.get('new_quantity', 0)
+            quantity = new_item_data.get('new_quantity')
             purchase_price = new_item_data.get('new_purchase_price')
+            amount = new_item_data.get('amount')
 
-            if not item_id or not description or not purchase_price:
+            if not item_id or not description or not quantity or not purchase_price or not amount:
                 return JsonResponse({'error': 'Please provide all required item details.'}, status=400)
 
-            try:
-                item = Inventory.objects.get(id=item_id)
-            except Inventory.DoesNotExist:
-                item = Inventory.objects.create(
-                    item=item_id,
-                    description=description,
-                    quantity=quantity,
-                    purchasePrice=purchase_price,
-                    salePrice=0.0,  # You might need to adjust this based on your requirements
-                )
-
-            amount = new_item_data.get('amount')
-            if amount and amount >= 1:
-                supplier_item = SupplierItems(purchase=invoice, sItem=item, amount=amount)
-                supplier_item.save()
-
+            # Create a new record in Orders using the provided details
+            order_item = Orders(item=description, description=description, quantity=quantity, purchasePrice=purchase_price, amount=amount)
+            order_item.save()
+            
         return JsonResponse({'message': 'Supplier items saved successfully.'})
-    
+
 class AddSupplierView(View):
     def post(self, request):
         data = json.loads(request.body)
@@ -203,20 +193,39 @@ class MarkInvoiceComplete(APIView):
             invoice = Invoice.objects.get(pk=invoice_id)
             invoice.iComplete = request.data.get("is_completed", False)
             invoice.save()
+
+            if invoice.iComplete:
+                customer_items = CustomerItems.objects.filter(invoice=invoice)
+                for item in customer_items:
+                    if item.invoice_item:
+                        inventory_item = item.cItem
+                        inventory_item.quantity -= item.amount
+                        inventory_item.save()
+
             return Response(status=status.HTTP_200_OK)
         except Invoice.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
+        
 class MarkPurchaseOrderComplete(APIView):
     def post(self, request, purchase_order_id):
         try:
             purchase_order = PurchaseOrder.objects.get(pk=purchase_order_id)
             purchase_order.complete = request.data.get("is_completed", False)
             purchase_order.save()
+
+            # Aktualizacja ilości produktów w Inventory na podstawie zamówienia
+            if purchase_order.complete:
+                supplier_items = SupplierItems.objects.filter(purchase=purchase_order)
+                for item in supplier_items:
+                    if item.order_item:
+                        inventory_item = item.sItem
+                        inventory_item.quantity += item.amount
+                        inventory_item.save()
+
             return Response(status=status.HTTP_200_OK)
         except PurchaseOrder.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
+        
 class ReportsView(View):
     def get(self, request):
         return render(request, 'polls/reports.html')

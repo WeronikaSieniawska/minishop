@@ -52,6 +52,7 @@
                         </td>
                         <td>
                             <input type="checkbox" class="invoice-complete" data-invoice-id="{{ data.invoice.id }}"
+                                data-status="mark-invoice-complete"
                                 {% if data.invoice.iComplete %} checked {% endif %}>
                         </td>
                     </tr>
@@ -85,6 +86,7 @@
                         </td>
                         <td>
                             <input type="checkbox" class="purchase-order-complete" data-purchase-id="{{ data.purchase_order.id }}"
+                                data-status="mark-purchase-order-complete"
                                 {% if data.purchase_order.complete %} checked {% endif %}>
                         </td>
                     </tr>
