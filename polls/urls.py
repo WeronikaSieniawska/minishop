@@ -16,4 +16,5 @@ urlpatterns = [
     path("add_supplier/", views.AddSupplierView.as_view(), name="add_supplier"),
     path("api/mark_invoice_complete/<int:invoice_id>/", views.MarkInvoiceComplete.as_view(), name="mark_invoice_complete"),
     path("api/mark_purchase_order_complete/<int:purchase_order_id>/", views.MarkPurchaseOrderComplete.as_view(), name='mark_purchase_order_complete'),
+     path('export/', views.export_data, name='export_data'),
 ]

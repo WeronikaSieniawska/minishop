@@ -34,7 +34,9 @@
                         <th>Date</th>
                         <th>Total Amount</th>
                         <th>Items (quantity)</th>
-                        <th>Status<th>
+                        <th>Status</th>
+                        <th>Download</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -54,6 +56,7 @@
                             <input type="checkbox" class="invoice-complete" data-invoice-id="{{ data.invoice.id }}"
                                 {% if data.invoice.iComplete %} checked {% endif %}>
                         </td>
+                        <td><button type="button" id="addNewItemButton">Download</button></td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -67,7 +70,8 @@
                         <th>Date</th>
                         <th>Total Amount</th>
                         <th>Items (quantity)</th>
-                        <th>Status<th>
+                        <th>Status</th>
+                        <th>Download</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -87,6 +91,7 @@
                             <input type="checkbox" class="purchase-order-complete" data-purchase-id="{{ data.purchase_order.id }}"
                                 {% if data.purchase_order.complete %} checked {% endif %}>
                         </td>
+                        <td><button type="button" id="addNewItemButton">Download</button></td>
                     </tr>
                     {% endfor %}
                 </tbody>

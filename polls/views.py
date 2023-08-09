@@ -7,6 +7,25 @@ import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from import_export import resources, fields, widgets, export
+from django.template.loader import render_to_string
+import csv
+
+
+
+def export_data(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="data_export.csv"'
+
+    invoices = Invoice.objects.all()
+
+    writer = csv.writer(response)
+    writer.writerow(['customer', 'iPubDate', 'iTotal', 'iComplete'])
+
+    for invoice in invoices:
+        writer.writerow([invoice.customer, invoice.iPubDate, invoice.iTotal, invoice.iComplete])
+
+    return response
 
 class InvoiceOfSalesView(View):
     def get(self, request):
