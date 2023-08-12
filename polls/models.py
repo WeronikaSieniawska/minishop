@@ -1,8 +1,4 @@
-import datetime
-
 from django.db import models
-from django.utils import timezone
-from django.contrib import admin
 from django.core.validators import MinValueValidator
 
 class Inventory(models.Model):
@@ -11,6 +7,12 @@ class Inventory(models.Model):
     quantity = models.IntegerField(default=0, null=False, blank=False, validators=[MinValueValidator(0)])
     purchasePrice = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0.01)])
     salePrice = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0.01)])
+
+    @classmethod
+    def create_new_item(cls, item_name, description, purchase_price):
+        new_item = cls(item=item_name, description=description, quantity=0, purchasePrice=purchase_price, salePrice=0.00)
+        new_item.save()
+        return new_item
 
     def __str__(self):
         return self.item
@@ -62,13 +64,3 @@ class SupplierItems(models.Model):
 
     def __str__(self):
         return f"Amount: {self.amount}"
-    
-class Orders(models.Model):
-    item = models.TextField(max_length=40, null=False, blank=False)
-    description = models.TextField(max_length=300, null=False, blank=False)
-    quantity = models.IntegerField(default=0, null=False, blank=False, validators=[MinValueValidator(0)])
-    purchasePrice = models.FloatField(null=False, blank=False, validators=[MinValueValidator(0.01)])
-    salePrice = models.FloatField(default=0, null=False, blank=False, validators=[MinValueValidator(0.01)])
-
-    def __str__(self):
-        return self.item

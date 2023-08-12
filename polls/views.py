@@ -1,8 +1,10 @@
+from django.db.utils import IntegrityError
 from django.shortcuts import render, get_object_or_404
 from django.views import View
 from django.http import JsonResponse
-from .models import Inventory, Customers, Invoice, CustomerItems, Suppliers, SupplierItems, PurchaseOrder, Orders
+from .models import Inventory, Customers, Invoice, CustomerItems, Suppliers, SupplierItems, PurchaseOrder
 from datetime import datetime
+from django.core.exceptions import ValidationError
 import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -37,6 +39,16 @@ class SaveCustomerItemsView(View):
         invoice = Invoice(customer=customer, iPubDate=invoice_date, iTotal=total_amount, iComplete=False)
         invoice.save()
 
+        # First, save all items to CustomerItems
+        if items:
+            self.save_customer_items(invoice, items)
+
+        # Then, update the quantity of items in Inventory
+        self.update_inventory_quantity(items)
+
+        return JsonResponse({'message': 'Customer items saved successfully.'})
+
+    def save_customer_items(self, invoice, items):
         for item_data in items:
             item_id = item_data.get('item_id')
             amount = item_data.get('amount')
@@ -45,13 +57,31 @@ class SaveCustomerItemsView(View):
                 try:
                     item = Inventory.objects.get(id=item_id)
                 except Inventory.DoesNotExist:
+                    # The item doesn't exist in the Inventory, so we'll skip it
                     continue
 
-                customer_item = CustomerItems(invoice=invoice, cItem=item, amount=amount)
+                # Save the item in CustomerItems
+                customer_item = CustomerItems(invoice=invoice, cItem=item, amount=amount, invoice_item=True)
                 customer_item.save()
+                print('Saved item in CustomerItems.')
 
-        return JsonResponse({'message': 'Customer items saved successfully.'})
-    
+    def update_inventory_quantity(self, items):
+        for item_data in items:
+            item_id = item_data.get('item_id')
+            amount = item_data.get('amount')
+
+            if item_id and amount and amount >= 1:
+                try:
+                    item = Inventory.objects.get(id=item_id)
+                except Inventory.DoesNotExist:
+                    # The item doesn't exist in the Inventory, so we'll skip it
+                    continue
+
+                # Update the quantity of the item in Inventory
+                item.quantity -= amount
+                item.save()
+                print('Updated item quantity in Inventory.')
+
 class AddCustomerView(View):
     def post(self, request):
         data = json.loads(request.body)
@@ -85,31 +115,53 @@ class PurchaseOrderView(View):
         current_date = datetime.now().strftime("%Y-%m-%d")
         return render(request, 'polls/purchase_order.html', {'inventory_data': inventory_data, 'suppliers': suppliers, 'current_date': current_date})
 
+# Define the function to get item information from the source (placeholder implementation)
+def get_item_info_from_source(item_id):
+    # Replace this with your actual logic to fetch item information
+    try:
+        item_info = Inventory.objects.get(id=item_id)
+        return {
+            'description': item_info.description,
+            'quantity': item_info.quantity,
+            'purchase_price': item_info.purchase_price,
+        }
+    except Inventory.DoesNotExist:
+        # Item with the given ID does not exist in the source
+        return None
+
 class SaveSupplierItemsView(View):
     def post(self, request):
         data = json.loads(request.body)
         supplier_name = data.get('supplier')
-        invoice_date = data.get('pubDate')
+        pub_date = data.get('pubDate')
         total_amount = data.get('total')
         items = data.get('items')
-        new_items = data.get('new_items')
 
         if not supplier_name:
             return JsonResponse({'error': 'Please provide a supplier name.'}, status=400)
 
-        if not invoice_date:
+        if not pub_date:
             return JsonResponse({'error': 'Please provide an invoice date.'}, status=400)
 
         if not total_amount:
             return JsonResponse({'error': 'Please provide a total amount.'}, status=400)
 
         supplier, created = Suppliers.objects.get_or_create(sName=supplier_name)
-        pub_date = datetime.strptime(invoice_date, "%d-%m-%Y").strftime("%Y-%m-%d")
+        pub_date = datetime.strptime(pub_date, "%d-%m-%Y").strftime("%Y-%m-%d")
 
         invoice = PurchaseOrder(supplier=supplier, pubDate=pub_date, total=total_amount, complete=False)
         invoice.save()
 
-        # Save existing items
+        # First, save all items to SupplierItems
+        if items:
+            self.save_supplier_items(invoice, items)
+
+        # Then, add missing items to Inventory (if not already present)
+        self.add_missing_items_to_inventory(items)
+
+        return JsonResponse({'message': 'Supplier items saved successfully.'})
+
+    def save_supplier_items(self, invoice, items):
         for item_data in items:
             item_id = item_data.get('item_id')
             amount = item_data.get('amount')
@@ -118,28 +170,76 @@ class SaveSupplierItemsView(View):
                 try:
                     item = Inventory.objects.get(id=item_id)
                 except Inventory.DoesNotExist:
-                    continue
+                    # The item doesn't exist in the Inventory, so we'll create it
+                    item_info = self.get_item_info_from_source(item_id)
+                    if item_info:
+                        item = Inventory(
+                            item=item_info['description'],
+                            description=item_info['description'],
+                            quantity=amount,
+                            purchasePrice=item_info['purchase_price'],
+                            salePrice=0.00
+                        )
+                        item.save()
+                        print('Added new item to Inventory.')
 
-                supplier_item = SupplierItems(purchase=invoice, sItem=item, amount=amount)
+                order_item = True
+                # Save the item in SupplierItems
+                supplier_item = SupplierItems(
+                    purchase=invoice,
+                    sItem=item,
+                    amount=amount,
+                    order_item=order_item
+                )
                 supplier_item.save()
 
-        # Save new items to Orders table
-        for new_item_data in new_items:
-            item_id = new_item_data.get('new_item')
-            description = new_item_data.get('new_description')
-            quantity = new_item_data.get('new_quantity')
-            purchase_price = new_item_data.get('new_purchase_price')
-            amount = new_item_data.get('amount')
+                # Update the quantity of the item in Inventory
+                item.quantity += amount
+                item.save()
+                print('Saved item in SupplierItems.')
+                print('Updated item quantity in Inventory.')
 
-            if not item_id or not description or not quantity or not purchase_price or not amount:
-                return JsonResponse({'error': 'Please provide all required item details.'}, status=400)
+    def item_exists_in_inventory(self, item_id):
+        try:
+            Inventory.objects.get(id=item_id)
+            return True
+        except Inventory.DoesNotExist:
+            return False
 
-            # Create a new record in Orders using the provided details
-            order_item = Orders(item=description, description=description, quantity=quantity, purchasePrice=purchase_price, amount=amount)
-            order_item.save()
-            
-        return JsonResponse({'message': 'Supplier items saved successfully.'})
+    def add_missing_items_to_inventory(self, items):
+        for item_data in items:
+            item_id = item_data.get('item_id')
+            amount = item_data.get('amount')
 
+            if item_id and amount and amount >= 1:
+                if not self.item_exists_in_inventory(item_id):
+                    # Dodaj nowy element do Inventory
+                    item_info = self.get_item_info_from_source(item_id)
+                    if item_info:
+                        new_inventory_item = Inventory(
+                            item=item_info['description'],
+                            description=item_info['description'],
+                            quantity=0,
+                            purchasePrice=item_info['purchase_price'],
+                            salePrice=0.00
+                        )
+                        new_inventory_item.save()
+                        print('Saved new item in Inventory.')
+                        print('Item id:', item_id, 'Amount:', amount)
+
+    # Placeholder function to get item information from the source (replace with actual logic)
+    def get_item_info_from_source(self, item_id):
+        try:
+            item_info = Inventory.objects.get(id=item_id)
+            return {
+                'description': item_info.description,
+                'quantity': item_info.quantity,
+                'purchase_price': item_info.purchasePrice,
+            }
+        except Inventory.DoesNotExist:
+            # Item with the given ID does not exist in the source
+            return None
+        
 class AddSupplierView(View):
     def post(self, request):
         data = json.loads(request.body)
@@ -166,6 +266,35 @@ class CheckSupplierExistsView(View):
 
         return JsonResponse({'exists': True, 'supplier_id': supplier.id})
 
+class AddItemView(View):
+    def get(self, request):
+        return render(request, 'polls/add_item.html')
+
+    def post(self, request):
+        data = request.POST
+        item_name = data.get('item_name')
+        item_description = data.get('item_description')
+        item_quantity = data.get('item_quantity')
+        item_purchase_price = data.get('item_purchase_price')
+
+        if not item_name or not item_description or not item_quantity or not item_purchase_price:
+            return JsonResponse({'error': 'All fields are required.'}, status=400)
+
+        try:
+            new_item = Inventory(
+                item_name=item_name,
+                description=item_description,
+                quantity=int(item_quantity),
+                purchase_price=float(item_purchase_price),
+                sale_price=0.00
+            )
+            new_item.save()
+
+            # Przekierowanie do strony invoice_of_sales.html po zapisaniu
+            return JsonResponse({'message': 'Item added successfully.', 'redirect_url': '/invoice_of_sales/'})
+        except IntegrityError:
+            return JsonResponse({'error': 'Item already exists.'}, status=400)
+        
 class IncomeAndExpenditureView(View):
     def get(self, request):
         # Fetch all the invoices and purchase orders
@@ -229,4 +358,3 @@ class MarkPurchaseOrderComplete(APIView):
 class ReportsView(View):
     def get(self, request):
         return render(request, 'polls/reports.html')
-

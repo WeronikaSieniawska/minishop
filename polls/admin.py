@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Inventory, Suppliers, Customers, Invoice, PurchaseOrder, CustomerItems, SupplierItems, Orders
+from .models import Inventory, Suppliers, Customers, Invoice, PurchaseOrder, CustomerItems, SupplierItems
 
 # Rejestracja modeli w panelu administracyjnym
 
@@ -30,10 +30,6 @@ class CustomerItemsAdmin(admin.ModelAdmin):
 @admin.register(SupplierItems)
 class SupplierItemsAdmin(admin.ModelAdmin):
     list_display = ('sItem', 'amount')
-
-@admin.register(Orders)
-class OrderAdmin(admin.ModelAdmin):
-    list_display = ('item', 'description', 'quantity', 'purchasePrice')
 
 # Dodatkowe dostosowanie panelu administracyjnego
 

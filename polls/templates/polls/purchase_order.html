@@ -14,6 +14,7 @@
         <ul>
             <li class="tab-link active" data-tab="invoice-of-Orders"><a href="{% url 'polls:invoice_of_sales' %}">Invoice of order</a></li>
             <li class="tab-link" data-tab="purchase-order"><a href="#">Purchase order</a></li>
+            <li class="tab-link" data-tab="reports"><a href="{% url 'polls:add_item' %}">Add item</a></li>
             <li class="tab-link" data-tab="income-and-expenditure"><a href="{% url 'polls:income_and_expenditure' %}">Income and Expenditure</a></li>
             <li class="tab-link" data-tab="reports"><a href="{% url 'polls:reports' %}">Reports</a></li>
         </ul>
@@ -42,7 +43,6 @@
 
                 <button type="button" id="calculateButton">Calculate Total</button>
                 <button type="button" id="saveButton">Save</button>
-                <button type="button" id="addNewItemButton">Add New Item</button>
             </form>
 
             <h2>Items</h2>
