@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'polls/css/style.css' %}">
+    <title>Invoice App - Income and Expenditure</title>
+</head>
+
+<body>
+    <div class="sidebar">
+        <ul>
+            <li class="tab-link" data-tab="invoice-of-sales"><a href="{% url 'polls:invoice_of_sales' %}">Invoice of sales</a></li>
+            <li class="tab-link" data-tab="purchase-order"><a href="{% url 'polls:purchase_order' %}">Purchase order</a></li>
+            <li class="tab-link active" data-tab="income-and-expenditure"><a href="#">Income and Expenditure</a></li>
+            <li class="tab-link" data-tab="reports"><a href="{% url 'polls:reports' %}">Reports</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div id="invoice-of-sales" class="tab-content">
+            <!-- Treść zawartości dla zakładki "Income and Expenditure" -->
+            <h2>Income and Expenditure</h2>
+            <h2>Invoice of Sales</h2>
+            <ul class="form-list" id="invoice-form-list">
+                <li>
+                    <form>
+                        <!-- Dodaj pola dla faktur rzeczy sprzedanych -->
+                    </form>
+                </li>
+                <!-- Dodaj więcej formularzy, jeśli jest to wymagane -->
+            </ul>
+            <p>Income: <span id="invoice-total">0</span> €</p>
+        </div>
+
+        <div id="purchase-order" class="tab-content">
+            <!-- Treść zawartości dla zakładki "Purchase Orders" -->
+            <h2>Purchase Orders</h2>
+            <ul class="form-list" id="order-form-list">
+                <li>
+                    <form>
+                        <!-- Dodaj pola dla faktur rzeczy kupionych -->
+                    </form>
+                </li>
+                <!-- Dodaj więcej formularzy, jeśli jest to wymagane -->
+            </ul>
+            <p>Expenditure: <span id="order-total">0</span> €</p>
+        </div>
+    </div>
+
+    <script src="{% static 'polls/js/script.js' %}"></script>
+</body>
+
+</html>
