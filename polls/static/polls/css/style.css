@@ -1,6 +1,6 @@
 /* style.css */
 
-/* Resetowanie styli dla całej strony */
+/* Reset styles for the entire page */
 body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, form, input, button, table, th, td {
   margin: 0;
   padding: 0;
@@ -8,19 +8,19 @@ body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, form, input, button, table, th, td 
   font-family: Arial, sans-serif;
 }
 
-/* Ustawienie tła dla całej strony */
+/* Set background color for the entire page */
 body {
   background-color: #f2f2f2;
 }
 
-/* Styl dla głównego kontenera */
+/* Style for the main container */
 .content {
   padding: 20px;
   max-width: 1000px;
   margin: 0 auto;
 }
 
-/* Styl dla bocznego paska nawigacji */
+/* Style for the sidebar navigation */
 .sidebar {
   background-color: #333;
   color: #fff;
@@ -51,8 +51,8 @@ body {
   background-color: #555;
 }
 
-/* Styl dla zawartości */
-.tab-content {
+/* Style for the tab content area */
+.content .tab_content {
   margin-left: 220px;
   padding: 20px;
 }
@@ -76,6 +76,8 @@ input[type="number"] {
   width: 100%;
   padding: 8px;
   margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 table {
@@ -83,8 +85,7 @@ table {
   border-collapse: collapse;
 }
 
-th,
-td {
+th, td {
   padding: 8px;
   text-align: left;
 }
@@ -103,6 +104,7 @@ button {
   background-color: #333;
   color: #fff;
   border: none;
+  border-radius: 5px;
   cursor: pointer;
 }
 
@@ -113,4 +115,133 @@ button:hover {
 .error-message {
   color: red;
   font-size: 14px;
+}
+
+/* Additional styles for better visuals */
+
+/* Style for the main heading */
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px 0;
+  background-color: #333;
+  color: #fff;
+}
+
+/* Style for the section headings */
+h2, h3 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Style for the list items */
+ul {
+  list-style-type: none;
+}
+
+ul li {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+/* Style for the link buttons */
+a.button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+a.button:hover {
+  background-color: #555;
+}
+
+/* Style for the container holding invoices and purchase orders */
+.invoice-container, .purchase-container {
+  margin-bottom: 30px;
+}
+
+/* Style for invoice and purchase order details */
+.invoice-details, .purchase-details {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+  background-color: #fff;
+}
+
+/* Style for item list in invoices and purchase orders */
+.item-list {
+  margin-top: 10px;
+}
+
+.item-list li {
+  margin-bottom: 5px;
+  color: #555;
+}
+
+/* Style for the grand total */
+.grand-total {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Style for the tables */
+.invoice-table, .purchase-order-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+.invoice-table th, .purchase-order-table th {
+  background-color: #333;
+  color: #fff;
+  padding: 8px;
+  text-align: left;
+}
+
+.invoice-table td, .purchase-order-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Style for the item list in the tables */
+.invoice-table ul, .purchase-order-table ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.invoice-table li, .purchase-order-table li {
+  margin-bottom: 5px;
+  color: #555;
+}
+
+/* Style for the grand total in the tables */
+.invoice-table .total-amount, .purchase-order-table .total-amount {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Style for the footer */
+footer {
+  text-align: center;
+  margin-top: 50px;
+  padding: 20px 0;
+  background-color: #333;
+  color: #fff;
+}
+
+/* Style for the search field */
+#searchField {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }

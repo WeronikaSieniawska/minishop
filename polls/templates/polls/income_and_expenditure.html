@@ -15,43 +15,89 @@
         <ul>
             <li class="tab-link" data-tab="invoice-of-sales"><a href="{% url 'polls:invoice_of_sales' %}">Invoice of sales</a></li>
             <li class="tab-link" data-tab="purchase-order"><a href="{% url 'polls:purchase_order' %}">Purchase order</a></li>
+            <li class="tab-link" data-tab="reports"><a href="{% url 'polls:add_item' %}">Add item</a></li>
             <li class="tab-link active" data-tab="income-and-expenditure"><a href="#">Income and Expenditure</a></li>
             <li class="tab-link" data-tab="reports"><a href="{% url 'polls:reports' %}">Reports</a></li>
         </ul>
     </div>
 
     <div class="content">
-        <div id="invoice-of-sales" class="tab-content">
-            <!-- Treść zawartości dla zakładki "Income and Expenditure" -->
+        <div id="income-and-expenditure" class="tab_content">
             <h2>Income and Expenditure</h2>
-            <h2>Invoice of Sales</h2>
-            <ul class="form-list" id="invoice-form-list">
-                <li>
-                    <form>
-                        <!-- Dodaj pola dla faktur rzeczy sprzedanych -->
-                    </form>
-                </li>
-                <!-- Dodaj więcej formularzy, jeśli jest to wymagane -->
-            </ul>
-            <p>Income: <span id="invoice-total">0</span> €</p>
-        </div>
 
-        <div id="purchase-order" class="tab-content">
-            <!-- Treść zawartości dla zakładki "Purchase Orders" -->
-            <h2>Purchase Orders</h2>
-            <ul class="form-list" id="order-form-list">
-                <li>
-                    <form>
-                        <!-- Dodaj pola dla faktur rzeczy kupionych -->
-                    </form>
-                </li>
-                <!-- Dodaj więcej formularzy, jeśli jest to wymagane -->
-            </ul>
-            <p>Expenditure: <span id="order-total">0</span> €</p>
+            <input type="text" id="searchField" class="searchField" placeholder="Search by customer or supplier or date (dd-mm-yyyy)">
+
+            <h3>Invoices</h3>
+            <table class="invoice-table" id="invoiceTable">
+                <thead>
+                    <tr>
+                        <th>Invoice for</th>
+                        <th>Date</th>
+                        <th>Total Amount</th>
+                        <th>Items (quantity)</th>
+                        <th>Status<th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in invoice_data %}
+                    <tr>
+                        <td>{{ data.invoice.customer }}</td>
+                        <td>{{ data.invoice.iPubDate | date:"d-m-Y" }}</td>
+                        <td>{{ data.total_amount }} €</td>
+                        <td>
+                            <ul>
+                                {% for item in data.items %}
+                                <li>{{ item.cItem.item }}: {{ item.amount }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <input type="checkbox" class="invoice-complete" data-invoice-id="{{ data.invoice.id }}"
+                                data-status="mark-invoice-complete"
+                                {% if data.invoice.iComplete %} checked {% endif %}>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h3>Purchase Orders</h3>
+            <table class="purchase-order-table" id="purchaseOrderTable">
+                <thead>
+                    <tr>
+                        <th>Purchase Order for</th>
+                        <th>Date</th>
+                        <th>Total Amount</th>
+                        <th>Items (quantity)</th>
+                        <th>Status<th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in purchase_order_data %}
+                    <tr>
+                        <td>{{ data.purchase_order.supplier }}</td>
+                        <td>{{ data.purchase_order.pubDate | date:"d-m-Y" }}</td>
+                        <td>{{ data.total_amount }} €</td>
+                        <td>
+                            <ul>
+                                {% for item in data.items %}
+                                <li>{{ item.sItem.item }}: {{ item.amount }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <input type="checkbox" class="purchase-order-complete" data-purchase-id="{{ data.purchase_order.id }}"
+                                data-status="mark-purchase-order-complete"
+                                {% if data.purchase_order.complete %} checked {% endif %}>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <script src="{% static 'polls/js/script.js' %}"></script>
+    <script src="{% static 'polls/js/script3.js' %}"></script>
 </body>
 
 </html>
