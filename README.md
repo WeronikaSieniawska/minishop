@@ -1,5 +1,5 @@
 # minishop
-Welcome to the CraftBiz Computer System, your solution for efficient inventory management and sales processing. This README will guide you through the installation process and help you get started with the system.
+Welcome to the Minishop Computer System, your solution for efficient inventory management and sales processing. This README will guide you through the installation process and help you get started with the system.
 
 Prerequisites:
 
